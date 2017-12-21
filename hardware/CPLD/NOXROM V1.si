@@ -1,0 +1,81 @@
+Name     NOXROM v1;
+PartNo   ATF750CL-15XU;
+Date     16-08-2016;
+Revision 01;
+Designer Rui Martins;
+Company  Z-Tech;
+Assembly None;
+Location Portugal;
+Device   V750CPPK;
+
+/* ATF22V10C-10XU; */
+/* G22V10 */
+
+ORDER: !MREQ, ADDR, F_ADDR, !ROMCS, !F_CE, !F_OE, !F_WR, WR_CMD, CNT2, CNT1, CNT0; 
+
+
+VECTORS:
+$MSG  "Test a sequence of 4 ADDR for all A15,A14 combinations.";
+$MSG  "Regular ROM access";
+1 '000' LLLLLZHHH****
+0 '000' LLLLLHLLH****
+$MSG  "Regular RAM access";
+1 '400' LLLLLZHHH****
+0 '400' LLLLLZHHH****
+1 '800' LLLLLZHHH****
+0 '800' LLLLLZHHH****
+1 'C00' LLLLLZHHH****
+0 'C00' LLLLLZHHH****
+$MSG  "Test trigger (3x) ADDR sequence, inside ROM area (A15,A14) = (0,0), Should trigger command BANK 'B'10101, and enable output";
+1 '0FE' LLLLLZHHH****
+0 '0FE' LLLLLHLLH****
+1 '0FE' LLLLLZHHH****
+0 '0FE' LLLLLHLLH****
+1 '0FE' LLLLLZHHH****
+0 '0FE' LLLLLHLLH****
+1 '015' LLLLLZHHH****
+0 '015' HLHLHHLLH****
+$MSG  "Regular ROM access";
+1 '000' HLHLHZHHH****
+0 '000' HLHLHHLLH****
+$MSG  "Regular ROM access";
+1 '001' HLHLHZHHH****
+0 '001' HLHLHHLLH****
+$MSG  "Test trigger (3x) ADDR sequence, inside ROM area (A15,A14) = (0,0), Should trigger command BANK 0, and enable output";
+1 '0FE' HLHLHZHHH****
+0 '0FE' HLHLHHLLH****
+1 '0FE' HLHLHZHHH****
+0 '0FE' HLHLHHLLH****
+1 '0FE' HLHLHZHHH****
+0 '0FE' HLHLHHLLH****
+1 '000' HLHLHZHHH****
+0 '000' LLLLLHLLH****
+$MSG  "Regular RAM access";
+1 '800' LLLLLZHHH****
+0 '800' LLLLLZHHH****
+$MSG  "Regular RAM access";
+1 '801' LLLLLZHHH****
+0 '801' LLLLLZHHH****
+$MSG  "Test trigger (3x) ADDR sequence, outside ROM area (A15,A14) != (0,0), should trigger command BANK 'B'01010, but NOT enable output";
+1 '8FE' LLLLLZHHH****
+0 '8FE' LLLLLZHHH****
+1 '8FE' LLLLLZHHH****
+0 '8FE' LLLLLZHHH****
+1 '8FE' LLLLLZHHH****
+0 '8FE' LLLLLZHHH****
+1 '90A' LLLLLZHHH****
+0 '90A' LHLHLZHHH****
+1 '07F' LHLHLZHHH****
+0 '07F' LHLHLHLHL****
+$MSG  "Regular RAM access";
+1 'C00' LHLHLZHHH****
+0 'C00' LHLHLZHHH****
+$MSG  "Test trigger (3x) ADDR sequence, inside ROM area (A15,A14) = (0,0), Should trigger command BANK 0, and enable output";
+1 '0FE' LHLHLZHHH****
+0 '0FE' LHLHLHLLH****
+1 '0FE' LHLHLZHHH****
+0 '0FE' LHLHLHLLH****
+1 '0FE' LHLHLZHHH****
+0 '0FE' LHLHLHLLH****
+1 '000' LHLHLZHHH****
+0 '000' LLLLLHLLH****

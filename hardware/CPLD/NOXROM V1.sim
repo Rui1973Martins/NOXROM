@@ -1,0 +1,195 @@
+%SIGNAL
+PIN  10 =  A0 
+PIN   9 =  A1 
+PIN   8 =  A2 
+PIN   7 =  A3 
+PIN   6 =  A4 
+PIN   5 =  A5 
+PIN   4 =  A6 
+PIN   3 =  A7 
+PIN  16 =  A8 
+PIN  13 =  A9 
+PIN  11 =  A14 
+PIN   2 =  A15 
+PIN  30 =  CNT0 
+PIN  29 =  CNT1 
+PIN  28 =  CNT2 
+PIN  17 =  F_A14 
+PIN  22 =  F_A15 
+PIN  21 =  F_A16 
+PIN  18 =  F_A17 
+PIN  20 =  F_A18 
+PIN  14 = !F_CE 
+PIN  15 = !F_OE 
+PIN  19 = !F_WR 
+PIN   1 = !MREQ 
+PIN  23 = !ROMCS 
+PIN  27 =  WR_CMD 
+%END
+
+%FIELD
+FIELD ADDR = A15,A14,A9,A8,A7,A6,A5,A4,A3,A2,A1,A0
+FIELD CNTR = CNT2,CNT1,CNT0
+FIELD F_ADDR = F_A18,F_A17,F_A16,F_A15,F_A14
+%END
+
+%EQUATION
+ADDR_CE =>
+    !A14 & !A15 & MREQ
+
+CNT0.d  =>
+    !A0 & A1 & A2 & A3 & A4 & A5 & A6 & A7 & !A8 & !A9 & !CNT0 & !CNT2
+  # !CNT0 & !CNT1 & CNT2 & WR_CMD
+
+CNT0.ar  =>
+    0 
+
+CNT0.ckmux  =>
+    MREQ
+
+CNT0.sp CNT1.sp CNT2.sp F_A14.sp F_A15.sp F_A16.sp F_A17.sp F_A18.sp WR_CMD.sp  =>
+    0 
+
+CNT1.d  =>
+    !A0 & A1 & A2 & A3 & A4 & A5 & A6 & A7 & !A8 & !A9 & !CNT0 & CNT1 & !CNT2
+  # !A0 & A1 & A2 & A3 & A4 & A5 & A6 & A7 & !A8 & !A9 & CNT0 & !CNT1 & !CNT2
+
+CNT1.ar  =>
+    0 
+
+CNT1.ckmux  =>
+    MREQ
+
+CNT1.sp  =>
+    
+CNT2.d  =>
+    !CNT0 & !CNT1 & CNT2 & WR_CMD
+  # CNT0 & CNT1 & !CNT2
+
+CNT2.ar  =>
+    0 
+
+CNT2.ckmux  =>
+    MREQ
+
+CNT2.sp  =>
+    
+F_A14.d  =>
+    A0
+
+F_A14.ar  =>
+    0 
+
+F_A14.ck  =>
+    !CNT0 & !CNT1 & CNT2 & !MREQ
+
+F_A14.oe  =>
+    1 
+
+F_A14.sp  =>
+    
+F_A15.d  =>
+    A1
+
+F_A15.ar  =>
+    0 
+
+F_A15.ck  =>
+    !CNT0 & !CNT1 & CNT2 & !MREQ
+
+F_A15.oe  =>
+    1 
+
+F_A15.sp  =>
+    
+F_A16.d  =>
+    A2
+
+F_A16.ar  =>
+    0 
+
+F_A16.ck  =>
+    !CNT0 & !CNT1 & CNT2 & !MREQ
+
+F_A16.oe  =>
+    1 
+
+F_A16.sp  =>
+    
+F_A17.d  =>
+    A3
+
+F_A17.ar  =>
+    0 
+
+F_A17.ck  =>
+    !CNT0 & !CNT1 & CNT2 & !MREQ
+
+F_A17.oe  =>
+    1 
+
+F_A17.sp  =>
+    
+F_A18.d  =>
+    A4
+
+F_A18.ar  =>
+    0 
+
+F_A18.ck  =>
+    !CNT0 & !CNT1 & CNT2 & !MREQ
+
+F_A18.oe  =>
+    1 
+
+F_A18.sp  =>
+    
+F_CE =>
+    !A14 & !A15 & !MREQ
+  # !F_WR
+
+F_OE =>
+    !A14 & !A15 & F_WR & !MREQ
+
+F_WR =>
+    CNT0 & !CNT1 & CNT2 & !MREQ
+
+ROMCS =>
+    !A14 & !A15 & !MREQ
+
+ROMCS.oe  =>
+    !A14 & !A15 & !MREQ
+
+TRIG_ADDR =>
+    !A0 & A1 & A2 & A3 & A4 & A5 & A6 & A7 & !A8 & !A9
+
+TRIG_STATE =>
+    !CNT0 & !CNT1 & CNT2
+
+TRIG_WRITE =>
+    CNT0 & !CNT1 & CNT2
+
+WR_CMD.d  =>
+    A8
+
+WR_CMD.ar  =>
+    0 
+
+WR_CMD.ck  =>
+    !CNT0 & !CNT1 & CNT2 & !MREQ
+
+WR_CMD.sp  =>
+    
+A8.oe  =>
+    0 
+
+F_CE.oe  =>
+    1 
+
+F_OE.oe  =>
+    1 
+
+F_WR.oe  =>
+    1 
+
+%END

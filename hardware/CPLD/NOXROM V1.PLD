@@ -1,0 +1,144 @@
+Name     NOXROM v1;
+PartNo   ATF750CL-15XU; /* TSSOP VERSION ATF22V10C-10XU */
+Date     16-08-2016;
+Revision 01;
+Designer Rui Martins;
+Company  Z-Tech;
+Assembly None;
+Location Portugal;
+Device   V750CPPK; /* V750C ; ATF22V10C ; G22V10 ; virtual */
+
+/* *************** INPUT PINS **********************/
+PIN  1 = !MREQ ;	/* ZX Memory Request         */ 
+PIN  2 =  A15	 ;	/* ZX ADDR                   */ 
+PIN  3 =  A7	 ;	/* ZX ADDR                   */ 
+PIN  4 =  A6	 ;	/* ZX ADDR                   */ 
+PIN  5 =  A5	 ;	/* ZX ADDR                   */ 
+PIN  6 =  A4	 ;	/* ZX ADDR                   */ 
+PIN  7 =  A3	 ;	/* ZX ADDR                   */ 
+PIN  8 =  A2	 ;	/* ZX ADDR                   */ 
+PIN  9 =  A1	 ;	/* ZX ADDR                   */ 
+PIN 10 =  A0	 ;	/* ZX ADDR                   */ 
+PIN 11 =  A14	 ;	/* ZX ADDR                   */ 
+
+PIN 13 =  A9        ; /* ZX ADDR                   */ 
+PIN 16 =  A8        ; /* ZX ADDR                   */ 
+
+
+/* *************** OUTPUT PINS **********************/
+PIN 23 = !ROMCS     ; /* ZX ROM Chip Select         */ 
+PIN 22 =  F_A15     ; /* FLASH Memory ADDR          */ 
+PIN 21 =  F_A16     ; /* FLASH Memory ADDR          */ 
+PIN 20 =  F_A18     ; /* FLASH Memory ADDR          */ 
+PIN 19 = !F_WR      ; /* FLASH Memory Write Enable  */ 
+PIN 18 =  F_A17     ; /* FLASH Memory ADDR          */ 
+PIN 17 =  F_A14     ; /* FLASH Memory ADDR          */ 
+PIN 15 = !F_OE      ; /* FLASH Memory Output Enable */ 
+PIN 14 = !F_CE      ; /* FLASH Memory Chip Enable   */ 
+
+/* ************* INTERNAL PINS *********************/
+/* PINNODE [25..34] = [CNT14..CNT23  ];*/ /* PINNODE 25..34 for Q1 of pins 14..23 */
+PINNODE [28..30] = [CNT2..CNT0];
+
+PINNODE 27 = WR_CMD ; /* Write Enable */
+
+/*
+PINNODE 26 = LOCKED ;
+PINNODE 25 = DISABLED ;
+*/
+
+/* Z80 (partial) Address */
+FIELD ADDR = [ A15, A14, A9..A0 ];
+
+
+FIELD CNTR = [ CNT2..CNT0 ];
+CNTR.ar = 'B'0; /* disable */
+CNTR.sp = 'B'0; /* disable */
+CNTR.ckmux = MREQ ;
+
+
+$DEFINE CNTR_0 'B'000
+$DEFINE CNTR_1 'B'001
+$DEFINE CNTR_2 'B'010
+$DEFINE CNTR_3 'B'011
+$DEFINE CNTR_4 'B'100
+$DEFINE CNTR_5 'B'101
+
+
+TRIG_ADDR = ADDR:'H'X0FE ;
+TRIG_STATE = [CNT2..CNT0]:CNTR_4;
+TRIG_WRITE = [CNT2..CNT0]:CNTR_5;
+
+
+SEQUENCED CNTR {
+
+	PRESENT  CNTR_0
+		IF TRIG_ADDR	NEXT CNTR_1;
+		DEFAULT	NEXT CNTR_0;
+
+	PRESENT CNTR_1
+		IF TRIG_ADDR NEXT CNTR_2;
+		DEFAULT	NEXT CNTR_0;
+
+	PRESENT CNTR_2
+		IF TRIG_ADDR	NEXT CNTR_3;
+		DEFAULT	NEXT CNTR_0;
+
+	PRESENT CNTR_3
+		DEFAULT	NEXT CNTR_4;
+
+	PRESENT CNTR_4
+		IF WR_CMD:1	NEXT CNTR_5;
+		DEFAULT	NEXT CNTR_0;
+
+	PRESENT CNTR_5
+		DEFAULT	NEXT CNTR_0;
+
+}
+
+
+ADDR_CE  = ( !A14 & !A15 & MREQ ) ;
+
+ROMCS    = !ADDR_CE ;
+ROMCS.OE =  ADDR_CE ;
+
+WR_CMD.D  = A8 ;
+WR_CMD.CK = MREQ & TRIG_STATE;
+WR_CMD.AR = 'B'0; /* Disable */
+WR_CMD.SP = 'B'0; /* Disable */
+
+F_WR = MREQ & TRIG_WRITE ; /* MREQ & TRIG_STATE ; */
+
+F_CE = ADDR_CE #  F_WR;
+F_OE = ADDR_CE & !F_WR ;
+
+/* ROM Page Register (5 Flip-Flops) */
+FIELD F_ADDR = [ F_A18..F_A14 ];
+F_ADDR.D  = [ A4..A0 ];
+F_ADDR.CK = MREQ & TRIG_STATE;
+F_ADDR.AR = 'B'0; /* disable */
+/* F_ADDR.OE = 'B'1; */ /* SOFTWARE BUG, setting OE wrongly to 0 */
+F_A14.OE = 'B' 1;
+F_A15.OE = 'B' 1;
+F_A16.OE = 'B' 1;
+F_A17.OE = 'B' 1;
+F_A18.OE = 'B' 1;
+
+F_ADDR.SP = 'B'0; /* disable */
+
+
+
+
+/*
+WARNING:
+There is a BUG in the software when we use output pins with similar names to extension names. In particular, when there is a name match, that differs in case only.
+
+Variable 'OE' versus extension '.oe'
+Pin variable 'OE' gets converted to 'oe' incorrectly, and simulator reports that it can't find it, since the correct name is 'OE', NOT 'oe'.
+
+Somehow, extension names are involved in this issue, because only when variables match with an extensino name, does this error happen.
+
+SOLUTION:
+Use all extensions in lower case to avoid this problem, or use different names for your own variables.
+*/
+
