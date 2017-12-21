@@ -6,12 +6,12 @@ To use a NOXROM cartridge a regular cartridge interface is required to plug it i
 
 Common retro interfaces are:
 - Sinclair ZX Interface 2
-. RAM Turbo
+- RAM Turbo
 - Kempston Pro
 
 Modern tnterfaces also exist, with the same compatible Cartridge socket, like the "SPECTRA Interface" by Paul Farrows.
 
 
-This is a hardware implementation of a new smart cartridge, that currently can have 128KB, 256KB or %12KB, pageable in 16KB blocks. This is implemented using a CPLD (for control logic) and a parallel interface Flash chip.
+This is a hardware implementation of a new smart cartridge, that supports 128KB, 256KB or 512KB in Flash ROM, pageable in 16KB blocks. This is implemented using a CPLD (for control logic) and a parallel interface Flash chip from ATMEL.
 
 NOXROM cartridge is smart, in the sense that it supports side band signaling, as a form of communication, that allows ZX software to control the internal cartridge paging register, hence allowing the use of the entire Flash chip memory, mapped into the ZX Spectrum ROM 16KB address space.
